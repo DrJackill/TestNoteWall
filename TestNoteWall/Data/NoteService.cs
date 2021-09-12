@@ -54,7 +54,7 @@ namespace TestNoteWall.Data
         #region
         public IEnumerable<Note> SearchNote(string searchingParameter)
         {
-           return _noteContext.Note.Where(a => a.NoteTitle.ToLower().Contains(searchingParameter.ToLower()) || a.NoteBody.ToLower().Contains(searchingParameter.ToLower()));
+           return _noteContext.Note.AsNoTracking().Where(a => a.NoteTitle.ToLower().Contains(searchingParameter.ToLower()) || a.NoteBody.ToLower().Contains(searchingParameter.ToLower()));
         }
         #endregion
     }
