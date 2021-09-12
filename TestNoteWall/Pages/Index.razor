@@ -1,0 +1,126 @@
+﻿@inject NoteService noteService
+@inject NavigationManager NavigationManager
+
+@page "/"
+<EditForm Model="@note">
+    <body class="centered-wrapper">
+        <div class="container">            
+            <form>               
+                <div class="row">               
+                    <div>
+                        <table class="input">
+                            <tr>
+                                <td>
+                                    <label for="ntitle">Note title</label>
+                                    <InputText id="ntitle" @bind-Value="note.NoteTitle" />
+                                </td>
+                                <td class="search">
+                                <td>
+                                    <label for="search">Search</label>
+                                </td>
+                                <td>
+                                    <button class="add" type="button" @onclick="SearchNote">Search</button>
+                                </td>
+                                <td>
+                                    <InputTextArea id="search" @bind-Value="searchedParameter" />
+                                </td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="nbody">Note body</label>
+                                    <InputTextArea id="nbody" @bind-Value="note.NoteBody" />
+                                </td>  
+                            </tr>
+                            <tr>
+                                <td>
+                                    <button type="submit" class="add" @onclick="AddOrUpdateNote">@ButtonAction</button>
+                                </td>                                        
+                            </tr>
+                        </table>                                                                  
+                    </div>
+                    <table class="table">                        
+                        @foreach (Note note in notes)
+                        {
+                            <tr class="note">
+                            <tr>
+                                <td>
+                                    @note.NoteTitle
+                                </td>
+                                <td class="noteActionButton">
+                                    <button type="button" @onclick="() => UpdateNote(note)">Edit</button>
+                                    <button type="button" @onclick="() => DeleteNote(note)">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @note.NoteBody
+                                </td>
+                            </tr>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </form>
+        </div>
+    </body>
+</EditForm>
+
+@code {
+    
+
+    private Note note = new Note();
+
+    private IEnumerable<Note> notes;
+
+    private string ButtonAction = "Add Note";
+
+    private string searchedParameter;
+
+    private void AddOrUpdateNote()
+    {
+        if (note.NoteBody == null || note.NoteTitle == null)
+        {
+            return;
+        }
+        if (ButtonAction == "Add Note")
+        {
+            notes = noteService.AddNote(note);
+        }
+        else
+        {
+            notes = noteService.UpdateNote(note);
+        }
+    }
+
+    private void UpdateNote(Note redactebelNote)
+    {
+        note.id = redactebelNote.id;
+        note.NoteTitle = redactebelNote.NoteTitle;
+        note.NoteBody = redactebelNote.NoteBody;
+        ButtonAction = "Update";
+    }
+
+    private void DeleteNote(Note note)
+    {
+        notes = noteService.DeleteNote(note);
+    }
+
+    protected override void OnInitialized()
+    {
+        notes = noteService.GetNotes();
+    }
+
+    private void SearchNote()
+    {
+        if (searchedParameter == null)
+        {
+            notes = noteService.GetNotes();
+        }
+        notes = noteService.SearchNote(searchedParameter);
+    }
+    public NoteService Service()
+    {
+        return noteService;
+    }
+}
